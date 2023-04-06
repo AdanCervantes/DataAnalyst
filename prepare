@@ -171,3 +171,15 @@ all_year <- bind_rows(feb2022, mar2022, abr2022, may2022, jun2022, jul2022, ago2
 
 # Write filtered data into a new file.
 write.csv(all_year,"output.csv", row.names = FALSE)
+
+#======================================================
+# STEP 3: CLEAN UP AND ADD DATA TO PREPARE FOR ANALYSIS
+#======================================================
+# Inspect the new table that has been created
+colnames(all_year)  #List of column names
+nrow(all_year)  #How many rows are in data frame?
+dim(all_year)  #Dimensions of the data frame?
+head(all_year)  #See the first 6 rows of data frame.  Also tail(all_trips)
+str(all_year)  #See list of columns and data types (numeric, character, etc)
+summary(all_year)  #Statistical summary of data. Mainly for numerics
+all_year <- na.omit(all_year) #remove all NA's from data
