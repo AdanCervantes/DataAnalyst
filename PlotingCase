@@ -1,0 +1,79 @@
+
+day_of_week <- all_year %>% select(day_of_week) %>% count(day_of_week)
+
+ggplot(data = day_of_week) +
+  geom_col(mapping = aes(x = day_of_week, y = as.numeric(n))) +
+  labs(title = "Total usage per day", subtitle = "Figure 1")
+
+rides_by_day <- all_year %>%
+  select(member_casual, day_of_week) %>%
+  count(member_casual, day_of_week) %>%
+  arrange(member_casual, day_of_week)
+  
+ggplot(data = rides_by_day) +
+  geom_col(mapping = aes(x=day_of_week, y=n, fill=member_casual), position = "dodge") +
+  #facet_wrap(~member_casual) +
+  theme(axis.text.x=element_text(angle = 45, hjust=1)) +
+  labs(title = "Total usage per day per rider type", subtitle = "Figure 2")  
+
+day_of_week_per_rider <- all_year %>%
+  select(member_casual, day_of_week, rideable_type) %>%
+  count(member_casual, day_of_week, rideable_type)
+
+ggplot(data = day_of_week_per_rider) +
+  geom_col(mapping = aes(x=day_of_week, y=n, fill=member_casual)) +
+  facet_wrap(~rideable_type~member_casual) +
+  theme(axis.text.x=element_text(angle = 45, hjust=1)) +
+  labs(title = "Total usage per day per rider type", subtitle = "Figure 2")
+
+day_of_week_per_bike <- all_year %>%
+  select(rideable_type, day_of_week) %>%
+  count(rideable_type, day_of_week)
+
+ggplot(data = day_of_week_per_bike) +
+  geom_col(mapping = aes(x=day_of_week, y=n, fill=rideable_type)) +
+  facet_wrap(~rideable_type) +
+  theme(axis.text.x=element_text(angle = 45, hjust=1)) +
+  labs(title = "Total usage per day per rider type", subtitle = "Figure 2")
+
+#change coords to double
+all_year <-  mutate(all_year, start_lat = as.double(start_lat)
+                   ,start_lng = as.double(start_lng)
+                   , end_lat = as.double(end_lat)
+                   , end_lng = as.double(end_lng))
+str(all_year)
+
+gps <- all_year %>%
+  select(start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng) %>%
+  count(start_station_name, end_station_name,start_lat, start_lng, end_lat, end_lng) %>%
+  arrange(desc(n)) %>%
+  slice(1:20) 
+  
+# Write filtered data into a new file.
+write.csv(gps,"output.csv", row.names = FALSE)
+
+most_stations <- all_year %>%
+  select(start_station_name, member_casual) %>%
+  count(member_casual, start_station_name) %>%
+  arrange(desc(n)) %>%
+  slice(1:20) 
+
+ggplot(data = most_stations) +
+  geom_col(mapping = aes(x=start_station_name, y=n, fill=member_casual)) +
+ # facet_wrap(~member_casual) +
+  theme(axis.text.x=element_text(angle = 45, hjust=1)) +
+  labs(title = "Total usage per day per rider type", subtitle = "Figure 2")
+
+#convertir a Date para sacar mes  
+#adding a month column
+  all_year$month <- format(as.Date(all_year$started_at, format="%d/%m/%Y"),"%m") 
+  
+rides_by_month <- all_year %>%
+  select(month, member_casual, rideable_type) %>%
+  count(month, member_casual, rideable_type)
+
+ggplot(data = rides_by_month) +
+  geom_col(mapping = aes(x=month, y=n, fill=member_casual), position = "dodge") +
+  facet_wrap(~rideable_type) +
+  theme(axis.text.x=element_text(angle = 45, hjust=1)) +
+  labs(title = "Total usage per day per rider type", subtitle = "Figure 2")
